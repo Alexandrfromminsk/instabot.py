@@ -267,6 +267,7 @@ class InstaBot:
             'username': self.user_login,
             'password': self.user_password
         }
+        self.s
 
         self.s.headers.update({
             'Accept': '*/*',
