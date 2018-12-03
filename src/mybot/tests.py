@@ -1,3 +1,3 @@
 from superbot import SuperBot
 
-sb = SuperBot("aasa", "pswd")
+sb = SuperBot("testuserazaza", "P4ssword")
