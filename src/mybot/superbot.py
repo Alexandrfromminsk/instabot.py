@@ -20,8 +20,6 @@ class SuperBot:
     that I want.
     """
 
-    url = 'https://www.instagram.com/'
-
     def __init__(self, username, password):
         self.is_logged=False
         self.username=username.lower()
@@ -33,6 +31,9 @@ class SuperBot:
         setup_logging()
         self.logger.info("Bot started. User {} attempt to login".format(self.username))
         self.login()
+        time.sleep(3)
+        self.logout()
+
 
     def login(self):
 
@@ -66,7 +67,7 @@ class SuperBot:
         )
 
         self.csrftoken = login_page.cookies['csrftoken']
-        self.session.update({'X-CSRFToken': self.csrftoken})
+        self.session.headers.update({'X-CSRFToken': self.csrftoken})
         self.session.cookies['ig_vw'] = '1536'
         self.session.cookies['ig_pr'] = '1.25'
         self.session.cookies['ig_vh'] = '772'
@@ -81,6 +82,32 @@ class SuperBot:
                 self.logger.info("{} succesfully loged in".format(self.username))
             else:
                 self.logger.error("Failed to log in as {} with password {}".format(self.username, self.password))
+
+    def logout(self):
+        self.logger.info("loggin out...")
+        try:
+            logout_post_data={'csrfmiddlewaretoken': self.csrftoken}
+            logout=self.session.post(constants.url_logout, data=logout_post_data)
+            self.logger.info("Logout success!")
+            self.is_logged=False
+        except:
+            self.logger.error("Logout Error!")
+
+    def get_media_id_by_tag(self, tag):
+        if self.is_logged:
+            self.logger.info("Trying to get data by tag {} ..".format(tag))
+            url_tag=constants.url_tag % (tag)
+            media_by_tag=[]
+            try:
+                resp=self.session.get(url_tag)
+                all_data=json.load(resp.text)
+                media_by_tag=list(all_data['graphql']['hashtag']['edge_hashtag_to_media']['edges'])
+            except:
+                self.logger.error("Failed to get media by tag {}".format(tag))
+            return media_by_tag
+
+
+
 
 
 
